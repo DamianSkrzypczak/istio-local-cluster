@@ -1,0 +1,15 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  components:
+    ingressGateways:
+      - name: istio-ingressgateway
+        k8s:
+          overlays:
+            - kind: Service
+              name: istio-ingressgateway
+              patches:
+                - path: spec.ports.[name:http2].nodePort
+                  value: 31077
+                - path: spec.ports.[name:https].nodePort
+                  value: 32360
