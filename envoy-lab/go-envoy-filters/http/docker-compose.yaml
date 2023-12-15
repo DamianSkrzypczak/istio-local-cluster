@@ -1,0 +1,42 @@
+services:
+
+  proxy:
+    image: envoyproxy/envoy:contrib-v1.28.0
+    depends_on:
+      helloworld_service:
+        condition: service_healthy
+      go_plugin_compile:
+        condition: service_completed_successfully
+    ports:
+      - '${PORT_PROXY:-10000}:10000'
+    environment:
+      - GODEBUG=cgocheck=0
+    command: ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
+    volumes:
+      - .:/source
+      - ./envoy.yaml:/etc/envoy.yaml
+      - ./lib/simple.so:/lib/simple.so # plugin volume mount
+
+  # example hello world service (python)
+  helloworld_service:
+    build:
+      context: hello-service/
+      target: aiohttp-hello-service
+
+  # short living service
+  # environment for go-plugin compilation only
+  go_plugin_compile:
+    build:
+      context: go-filter-plugin/
+      target: golang-base
+    command: >
+      bash -c "
+      cd go-filter-plugin/
+      && go build -o simple.so -buildmode=c-shared .
+      && cp ./simple.so /output"
+    working_dir: /source
+    environment:
+    - GOFLAGS=-buildvcs=false
+    volumes:
+    - .:/source
+    - ./lib:/output
