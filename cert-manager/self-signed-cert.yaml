@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: istio-selfsigned-certificate
+  namespace: istio-system
+spec:
+  dnsNames:
+    - 'productpage.default.svc.cluster.local' # DNS name for the productpage service
+  secretName: productpage-certificate # a descriptive name for the secret
+  issuerRef:
+    name: selfsigned-issuer
+    kind: Issuer
