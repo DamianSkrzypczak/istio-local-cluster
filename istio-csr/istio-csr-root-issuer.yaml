@@ -1,0 +1,19 @@
+# SelfSigned issuers are useful for creating root certificates
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigned
+  namespace: istio-system
+spec:
+  selfSigned: {}
+##################################
+# For some reason, custom certificate
+# uploaded into secret results in
+# "OPENSSL_internal:CERTIFICATE_VERIFY_FAILED"
+# in ingressgateway when its trying to connect to productpage
+# TODO: research that further
+#
+# spec:
+#   ca:
+#     secretName: root-ca-cert
+#################################
