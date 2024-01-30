@@ -1,12 +1,17 @@
 help: ## Print this message and exit
 	@awk 'BEGIN {FS = ":.*?## "} /^[0-9a-zA-Z_-]+:.*?## / {printf "\033[36m%-40s\033[0m %s\n", $$1, $$2 | "sort"}' $(MAKEFILE_LIST)
 
-### Cluster setup
-
 KIND_CLUSTER_NAME := istio-testing
 KIND_CLUSTER_CONTEXT := kind-${KIND_CLUSTER_NAME}
 
-setup: pull-images create-cluster load-images install-istio apply-istio-addons apply-kustomize apply-bookinfo ## Setup kind cluster with istio + bookinfo
+setup: ## Setup kind cluster with istio + bookinfo
+setup: \
+	pull-images \
+	create-cluster \
+	load-images \
+	install-istio \
+	apply-istio-addons \
+	apply-kustomize
 
 pull-images: ## Pull istio/bookinfo docker images to host machine
 	kind-cluster/scripts/kind-pull-images-from-dockerhub.sh
@@ -23,21 +28,10 @@ install-istio: ## Install istio on kind cluster
 	istioctl install --set profile=demo -y --context=${KIND_CLUSTER_CONTEXT} -f kind-cluster/istio-ingressgateway.override.yaml
 
 apply-istio-addons: ## Install istio addons (allows for kiali dashboard)
-	kubectl apply -f istio-lab/addons --context=${KIND_CLUSTER_CONTEXT}
+	kubectl apply -f istio-addons --context=${KIND_CLUSTER_CONTEXT}
 
 apply-kustomize: ## Apply cluster_volume/ volume sc/pv/pvc
 	kubectl apply -k kind-cluster
 
-apply-bookinfo: ## Install bookinfo tutorial application (https://istio.io/latest/docs/examples/bookinfo/)
-	kubectl apply -f istio-lab/bookinfo --context=${KIND_CLUSTER_CONTEXT}
-
 teardown: ## Delete kind cluster, cleanup setup
 	kind delete cluster --name ${KIND_CLUSTER_NAME}
-
-### Cluster life-cycle commands
-
-dashboard: ## Run kiali dashboard (https://istio.io/latest/docs/ops/integrations/kiali/)
-	istioctl dashboard kiali
-
-traffic: ## Run bash script for generating traffic
-	istio-lab/scripts/generate-traffic.sh

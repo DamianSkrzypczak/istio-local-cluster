@@ -1,6 +1,0 @@
-spec:
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/userVolume: '[{"name":"cluster-volume-pvc","persistentVolumeClaim":{"claimName":"local-pvc"}}]'
-        sidecar.istio.io/userVolumeMount: '[{"mountPath":"/cluster-volume/","name":"cluster-volume-pvc"}]'

@@ -1,4 +1,0 @@
-
-# ignore build directory for golang plugin
-lib/**
-!lib/.keep
