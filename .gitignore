@@ -1,2 +1,4 @@
 cluster_volume/**
 !cluster_volume/.keep
+
+debug/
