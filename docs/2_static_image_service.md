@@ -1,0 +1,1 @@
+<img src="media/two-of-them.png" alt="image" width="600" height="auto">
